@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../../../../../../../languagetool-core/src/main/resources/org/languagetool/rules/print.xsl" ?>
+<?xml-stylesheet type="text/css" href="../../../../../../../../../languagetool-core/src/main/resources/org/languagetool/rules/rules.css"
+        title="Easy editing stylesheet" ?>
+<!--
+English Grammar and Typo Rules for LanguageTool
+See tagset.txt for the meaning of the POS tags
+Copyright (C) 2001-2015 Daniel Naber (http://www.danielnaber.de),
+  Marcin Miłkowski and the LanguageTool contributors
+
+Portions of rules are converted from After The Deadline grammar checker, 
+available at http://open.afterthedeadline.com/, licensed under
+GNU GPL.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
+USA
+-->
+
+<!DOCTYPE rules [
+<!ENTITY weekdays "Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday">
+<!ENTITY abbrevWeekdays "Mon|Mo|Tue|Tu|Wed|We|Thu|Th|Fri|Fr|Sat|Sa|Sun|Su">
+<!ENTITY months "January|February|March|April|May|June|July|August|September|October|November|December">
+<!ENTITY abbrevMonths "Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec">
+]>
+
+<rules lang="en" xsi:noNamespaceSchemaLocation="../../../../../../../../../languagetool-core/src/main/resources/org/languagetool/rules/rules.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<!-- ====================================================================== -->
+	<!-- Possible typo -->
+	<!-- ====================================================================== -->
+	<category id="TYPOS" name="Possible Typo" type="misspelling">
+
+		<rule id="TEST1" name="tmp">
+			<pattern>
+				<token regexp="yes" postag="NCMS00U" postag_regexp="yes">abbed</token>
+			</pattern>
+			<message>This is a message</message>
+			<example correction="yo">A fish jumped.</example>
+		</rule>
+
+		<rulegroup id="TALL_BINDESTREKER" name="Ord, tall og bindestreker">
+			<rule>
+				<pattern>
+					<token regexp="yes">.*([0-9]|\.)</token>
+					<token regexp="yes">årig|års.*|tallet</token>
+				</pattern>
+				<message>Det mangler kanskje en bindestrek: <suggestion><match no="1"/>-<match no="2"/></suggestion>.</message>
+				<short>Bindestrek mangler kanskje</short>
+				<example correction="1700-tallet">På <marker>1700 tallet</marker> hadde man ikke fly.</example>
+				<example correction="30-års-krigen"><marker>30 års-krigen</marker> vartet i 30 år.</example>
+				<example correction="3-årig">Han er et <marker>3 årig</marker> barn.</example>
+				<example>Pesten herjet på 1300-tallet.</example>
+			</rule>
+		</rulegroup>
+
+		<rulegroup id="CORRUPTED_AFFIXES" name="-ene din; -en dine; etc.">
+			<!---		(?<!en|ene|akkurat|nettopp)\s[md]ine?\s(?!egen|egne|tur)|(?<!et|akkurat|nettopp)\s[md]itt (?!eget|første)-->
+			<rule>
+				<pattern>
+					<token regexp="yes" postag="NCMP000D" postag_regexp="yes">[a-åA-Å]+ene</token>
+					<token regexp="yes">(?:din|min|sin)[^e]</token>
+				</pattern>
+				<message>Did you mean <suggestion>\1\2e</suggestion>?</message>
+				<example correction="planene mine">abc<marker>c</marker>.</example>
+			</rule>
+			<rule>
+				<pattern><!-- postag="N*" postag_regexp="yes"-->
+					<token regexp="yes" postag="NCMS000D"/>
+					<token regexp="yes">(?:[dms]in)e</token>
+				</pattern>
+				<message>Did you mean <suggestion>\1e \2</suggestion>?</message>
+				<example correction="planen min">abc<marker>c</marker>.</example>
+			</rule>
+		</rulegroup>
+		<rulegroup id="HAN_HAM" name="han(s)/ham(do)">
+			<rule>
+				<pattern>
+					<token regexp="yes" postag="CS|CC|SPS00" postag_regexp="yes"></token>
+					<token regexp="yes">han</token>
+				</pattern>
+				<message>Did you mean <suggestion>\1 ham</suggestion>?</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes" postag="CS|CC|SPS00" postag_regexp="yes"></token>
+					<token regexp="yes">hun</token>
+				</pattern>
+				<message>Did you mean <suggestion>\1 henne</suggestion>?</message>
+			</rule>
+		</rulegroup>
+		<rulegroup id="COMPARATIVE" name="pl. comp. + sing. noun">
+			<rule>
+				<pattern>
+					<token regexp="yes" postag="AQ00PP00|AQP0S00D" postag_regexp="yes"></token>
+					<token regexp="yes" postag="NCMS000U" postag_regexp="yes"></token>
+				</pattern>
+				<message>Did you mean <suggestion>\1 \2 + definite suffix</suggestion>?</message>
+			</rule>
+		</rulegroup>
+		<rulegroup id="OXFORD_COMMA" name="N, N, and N">
+			<rule><!-- This is a bit too narrow. -->
+				<pattern>
+					<token regexp="yes" postag="N.*" postag_regexp="yes"></token>
+					<token>, </token>
+					<token regexp="yes" postag="N.*" postag_regexp="yes"></token>
+					<token>, </token>
+					<token>og</token>
+					<token regexp="yes" postag="N.*" postag_regexp="yes"></token>
+				</pattern>
+				<message>Did you mean <suggestion>\1, \3 og \6</suggestion>?</message>
+			</rule>
+		</rulegroup>
+		<rulegroup id="THREE_LETTERS" name="lll|kkk|ttt,etc">
+			<rule>
+				<pattern>
+					<token regexp="yes">.*([a-zA-ZæøåÆØÅ])\1\1.*</token>
+				</pattern>
+				<message>Three consecutive letters! <suggestion>Try adding a hyphen or reducing to 2 letters.</suggestion></message>
+			</rule>
+		</rulegroup>
+	</category>	
+
+	<!-- ====================================================================== -->
+	<!-- Grammar -->
+	<!-- ====================================================================== -->
+	<category id="NOT_REAL_WORD" name="Not a real word" type="style">
+		<rulegroup id="NOT_REAL_WORD" name="Not a real word">
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[pP]lastikk.*</token>
+				</pattern>
+				<message>Plastikk is not a Norwegian word. Use <suggestion>plast</suggestion> instead.</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[pP]potensiale.*</token>
+				</pattern>
+				<message>Potensiale is not a Norwegian word. Use <suggestion>potensial</suggestion> instead.</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[oO]verimorgen.*</token>
+				</pattern>
+				<message>Overimorgen is not a Norwegian word. Use <suggestion>overmorgen</suggestion> instead.</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[fF]orhåndsregel.*</token>
+				</pattern>
+				<message>Forhåndsregel is not a Norwegian word. Use <suggestion>forholdsregel</suggestion> instead.</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[rR]eiseagent.*</token>
+				</pattern>
+				<message>Reiseagent is not a Norwegian word. Use <suggestion>reisebyrå</suggestion> instead.</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[dD]istriktsfakultet.*</token>
+				</pattern>
+				<message>Distriktsfakultet is an anglicism. Use <suggestion>skolekrets</suggestion> instead.</message>
+			</rule>
+			<rule>
+				<pattern>
+					<token regexp="yes">.*[pP]lastikk.*</token>
+				</pattern>
+				<message>Plastikk is not a Norwegian word. Use <suggestion>plast</suggestion> instead.</message>
+			</rule>
+		</rulegroup>
+	</category>
+
+	<!-- ====================================================================== -->
+	<!-- Grammar -->
+	<!-- ====================================================================== -->
+	<category id="GRAMMAR" name="Grammar" type="grammar">
+
+	</category>
+	<!-- ====================================================================== -->
+	<!-- Collocations -->
+	<!-- ====================================================================== -->
+	<category id="COLLOCATIONS" name="Collocations" type="grammar"></category>
+	<!-- ====================================================================== -->
+	<!-- Miscellaneous -->
+	<!-- ====================================================================== -->
+	<category id="MISC" name="Miscellaneous"></category>
+	<!-- ====================================================================== -->
+	<!-- Punctuation Errors -->
+	<!-- ====================================================================== -->
+	<category id="PUNCTUATION" name="Punctuation Errors" type="typographical"></category>
+	<!-- ====================================================================== -->
+	<!-- Commonly Confused Words -->
+	<!-- ====================================================================== -->
+	<category id="CONFUSED_WORDS" name="Commonly Confused Words" type="misspelling">
+
+		<!-- tilstede -> til stede -->
+		<!-- ut over -> utover -->
+
+		<!-- tilstede -> tilstede -->
+	</category>
+	<!-- ====================================================================== -->
+	<!-- Nonstandard Phrases -->
+	<!-- ====================================================================== -->
+	<category id="NONSTANDARD_PHRASES" name="Nonstandard Phrases" type="misspelling"></category>
+	<!-- ====================================================================== -->
+	<!-- Redundant Phrases -->
+	<!-- ====================================================================== -->
+	<category id="REDUNDANCY" name="Redundant Phrases" type="style"></category>
+	<!-- ====================================================================== -->
+	<!-- Style -->
+
+	<!-- Anglicism: undertekst -> teksting -->
+
+	<!-- ====================================================================== -->
+	<category id="STYLE" name="Style" type="style"></category>
+	<!-- ====================================================================== -->
+	<!-- Semantic -->
+	<!-- ====================================================================== -->
+	<category id="SEMANTICS" name="Semantic" type="inconsistency"></category>
+	<!-- ====================================================================== -->
+	<!-- Plain English -->
+	<!-- ====================================================================== -->
+	<category id="PLAIN_ENGLISH" name="Plain English" type="style" default="off"></category>
+	<!-- ====================================================================== -->
+	<!-- Wikipedia -->
+	<!-- ====================================================================== -->
+	<category id="WIKIPEDIA" name="Wikipedia" default="off"></category>
+
+	<category id="TYPOGRAPHY" name="Typography" type="typographical"></category>
+</rules>
